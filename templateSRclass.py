@@ -4,7 +4,7 @@ from numba import jit
 from joblib import Parallel, delayed
 from SRtools import deathTimesDataSet as dtds
 import os
-import sr_mcmc as srmc
+from SRtools import sr_mcmc as srmc
 
 
 jit_nopython = True
