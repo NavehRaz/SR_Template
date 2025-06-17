@@ -31,16 +31,14 @@ class My_SR(srh.SR_hetro):
 
 
     def calc_death_times(self):
-        #modify to add your things  here
         s = len(self.t)
         dt = self.t[1]-self.t[0]
         sdt = np.sqrt(dt)
         t = self.t
-
         if self.parallel:
-            death_times, events =death_times_accelerator2(s,dt,t,self.eta,self.beta,self.kappa,self.epsilon,self.xc,sdt,self.npeople,self.external_hazard,self.time_step_multiplier)
+            death_times, events = death_times_accelerator2(s,dt,t,self.eta,self.eta_var,self.beta,self.beta_var,self.kappa,self.kappa_var,self.epsilon, self.epsilon_var,self.xc,self.xc_var,sdt,self.npeople,self.external_hazard,self.time_step_multiplier)
         else:
-            death_times, events =death_times_accelerator(s,dt,t,self.eta,self.beta,self.kappa,self.epsilon,self.xc,sdt,self.npeople,self.external_hazard,self.time_step_multiplier)
+            death_times, events = death_times_accelerator(s,dt,t,self.eta,self.eta_var,self.beta,self.beta_var,self.kappa,self.kappa_var,self.epsilon, self.epsilon_var,self.xc,self.xc_var,sdt,self.npeople,self.external_hazard,self.time_step_multiplier)
 
         return np.array(death_times), np.array(events)
     
