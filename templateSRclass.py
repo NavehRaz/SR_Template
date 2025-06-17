@@ -14,7 +14,7 @@ After implementing your class, change sr_mcmc.model so it calls your class inste
 """
 
 
-class My_SR(srh.SR_hetro):
+class My_SR(srh.SR_Hetro):
     def __init__(self, eta, beta, kappa, epsilon, xc, npeople, nsteps, t_end,
                  eta_var = 0, beta_var = 0, kappa_var =0, epsilon_var =0, xc_var =0,
                    t_start=0, tscale='years', external_hazard=np.inf, time_step_multiplier=1, parallel=False, bandwidth=3, heun=False):
