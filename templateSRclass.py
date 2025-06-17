@@ -1,8 +1,8 @@
-import SRmodellib_lifelines as srl
+from SRtools import SR_hetro as srh
 import numpy as np
 from numba import jit
 from joblib import Parallel, delayed
-import deathTimesDataSet as dtds
+from SRtools import deathTimesDataSet as dtds
 import os
 import sr_mcmc as srmc
 
@@ -14,15 +14,18 @@ After implementing your class, change sr_mcmc.model so it calls your class inste
 """
 
 
-class My_SR(srl.SR_lf):
-    def __init__(self, eta, beta, kappa, epsilon, xc, npeople, nsteps, t_end, t_start=0, tscale='years', external_hazard=np.inf, time_step_multiplier=1, parallel=False, bandwidth=3, heun=False):
+class My_SR(srh.SR_hetro):
+    def __init__(self, eta, beta, kappa, epsilon, xc, npeople, nsteps, t_end,
+                 eta_var = 0, beta_var = 0, kappa_var =0, epsilon_var =0, xc_var =0,
+                   t_start=0, tscale='years', external_hazard=np.inf, time_step_multiplier=1, parallel=False, bandwidth=3, heun=False):
         """
         If you want to add parameters to the __init__ method, you can do so here before the call to super().__init__. if you add beta2 as aparameter for example then
         add self.beta2=beta2 here.
         """
         
+
         #this is the call to my class, do not modify it. also, do not earase any of the parameters I cal here unless you give them a default value or somehting
-        super().__init__(eta, beta, kappa, epsilon, xc, npeople, nsteps, t_end, t_start, tscale, external_hazard, time_step_multiplier, parallel, bandwidth, heun)
+        super().__init__(eta, beta, kappa, epsilon, xc, npeople, nsteps, t_end, eta_var, beta_var, kappa_var, epsilon_var, xc_var, t_start, tscale, external_hazard, time_step_multiplier, parallel, bandwidth, heun)
 
 
 
