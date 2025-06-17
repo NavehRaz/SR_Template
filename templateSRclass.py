@@ -43,7 +43,32 @@ class My_SR(srh.SR_hetro):
         return np.array(death_times), np.array(events)
     
 
+def getMySr(theta, n=25000,nsteps=6000,t_end=110, external_hazard = np.inf,time_step_multiplier =1, npeople =None, parallel = False,eta_var = 0, beta_var = 0, epsilon_var = 0, xc_var = 0.2, kappa_var = 0, hetro = True, bandwidth = 3):
+
+    if npeople is not None:
+        n = npeople
+    eta = theta[0]
+    beta = theta[1]
+    epsilon = theta[2]
+    xc = theta[3]
+    if not hetro:
+        eta_var =0
+        beta_var =0
+        epsilon_var =0
+        xc_var =0
+        kappa_var =0
+
+    if external_hazard is None or external_hazard == 'None':
+        external_hazard = np.inf
     
+    sim = My_SR(eta=eta,beta=beta,epsilon=epsilon,xc=xc,
+                   eta_var=eta_var,beta_var=beta_var,kappa_var=kappa_var,epsilon_var=epsilon_var,xc_var=xc_var,
+                   kappa=0.5,npeople=n,nsteps=nsteps,t_end=t_end,external_hazard=external_hazard, time_step_multiplier=time_step_multiplier,
+                     parallel=parallel, bandwidth=bandwidth)
+    
+    return sim
+
+
 def My_metric(ds,sim):
     """"
     implement your own metric here, and call it from sr_mcmc.model function
