@@ -191,7 +191,7 @@ def example_model(theta , n, nsteps, t_end, dataSet, sim=None, metric = 'baysian
 
 #method without parallelization (for cluster usage)
 @jit(nopython=jit_nopython)
-def death_times_accelerator(s,dt,t,eta,beta,kappa,epsilon,xc,sdt,npeople,external_hazard = np.inf, time_step_multiplier = 1):
+def death_times_accelerator(s,dt,t,eta0,eta_var,beta0,beta_var,kappa0,kappa_var,epsilon0,epsilon_var,xc0,xc_var,sdt,npeople,external_hazard = np.inf,time_step_multiplier = 1):
     death_times = []
     events = []
     for i in range(npeople):
@@ -200,6 +200,11 @@ def death_times_accelerator(s,dt,t,eta,beta,kappa,epsilon,xc,sdt,npeople,externa
         ndt = dt/time_step_multiplier
         nsdt = sdt/np.sqrt(time_step_multiplier)
         chance_to_die_externally = np.exp(-external_hazard)*ndt
+        eta = eta0*np.random.normal(loc = 1,scale = eta_var)
+        beta = beta0 * np.random.normal(loc = 1, scale = beta_var)
+        kappa = kappa0 * np.random.normal(loc = 1, scale = kappa_var)
+        epsilon = epsilon0 * np.random.normal(loc = 1, scale = epsilon_var)
+        xc = xc0 * np.random.normal(loc = 1, scale = xc_var)
         while j in range(s-1) and x<xc:
             for i in range(time_step_multiplier):
                 noise = np.sqrt(2*epsilon)*np.random.normal(loc = 0,scale = 1)
@@ -220,9 +225,9 @@ def death_times_accelerator(s,dt,t,eta,beta,kappa,epsilon,xc,sdt,npeople,externa
     return death_times, events
 
 ##method with parallelization (run on your computer)
-def death_times_accelerator2(s,dt,t,eta,beta,kappa,epsilon,xc,sdt,npeople,external_hazard = np.inf,time_step_multiplier = 1):
+def death_times_accelerator2(s,dt,t,eta,eta_var,beta,beta_var,kappa,kappa_var,epsilon,epsilon_var,xc,xc_var,sdt,npeople,external_hazard = np.inf,time_step_multiplier = 1):
     @jit(nopython=jit_nopython)
-    def calculate_death_times(npeople, s, dt, t, eta, beta, kappa, epsilon, xc, sdt, external_hazard,time_step_multiplier):
+    def calculate_death_times(npeople, s, dt, t, eta0,eta_var,beta0,beta_var,kappa0,kappa_var,epsilon0,epsilon_var,xc0,xc_var, sdt, external_hazard,time_step_multiplier):
         death_times = []
         events =[]
         for i in range(npeople):
@@ -232,6 +237,11 @@ def death_times_accelerator2(s,dt,t,eta,beta,kappa,epsilon,xc,sdt,npeople,extern
             ndt = dt/time_step_multiplier
             nsdt = np.sqrt(ndt)
             chance_to_die_externally = np.exp(-external_hazard)*ndt
+            eta = eta0*np.random.normal(loc = 1,scale = eta_var)
+            beta = beta0 * np.random.normal(loc = 1, scale = beta_var)
+            kappa = kappa0 * np.random.normal(loc = 1, scale = kappa_var)
+            epsilon = epsilon0 * np.random.normal(loc = 1, scale = epsilon_var)
+            xc = xc0 * np.random.normal(loc = 1, scale = xc_var)
             while j in range(s - 1) and x < xc and not died:
                 for i in range(time_step_multiplier):
                     noise = np.sqrt(2*epsilon)*np.random.normal(loc = 0,scale = 1)
@@ -253,7 +263,7 @@ def death_times_accelerator2(s,dt,t,eta,beta,kappa,epsilon,xc,sdt,npeople,extern
     n_jobs = os.cpu_count()
     npeople_per_job = npeople // n_jobs
     results = Parallel(n_jobs=n_jobs)(delayed(calculate_death_times)(
-        npeople_per_job, s, dt, t, eta, beta, kappa, epsilon, xc, sdt, external_hazard, time_step_multiplier
+        npeople_per_job, s, dt, t, eta,eta_var, beta,beta_var, kappa,kappa_var, epsilon,epsilon_var, xc,xc_var, sdt, external_hazard,time_step_multiplier
     ) for _ in range(n_jobs))
 
     death_times = [dt for sublist in results for dt in sublist[0]]
